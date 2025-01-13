@@ -13,7 +13,7 @@ function Footer() {
             </section>
             <footer className="border-t border-solid bg-[#070707]">
                 <div className="container px-3 py-8 mx-auto text-[#fff]">
-                    <div className="flex flex-wrap justify-between gap-5 text-sm">
+                    {/* <div className="flex flex-wrap justify-between gap-5 text-sm">
                         <div className="">
                             <strong className="block mb-2">NEM FASHION - THỜI TRANG CÔNG SỞ</strong>
                             <p className="mb-1">
@@ -52,7 +52,7 @@ function Footer() {
                             <img className="mb-2" src="https://theme.hstatic.net/200000182297/1000887316/14/image_method_3.png?v=1678" alt="" />
                             <img className="w-[118px]" src="https://theme.hstatic.net/200000182297/1000887316/14/bct.png?v=1678" alt="" />
                         </div>
-                    </div>
+                    </div> */}
                 </div>
                 <div className="bg-[#fff] py-2">
                     <p className="px-3 container mx-auto text-sm">© 2024 - Copyright Site</p>
