@@ -1,15 +1,9 @@
 import axios from 'axios';
 import { useEffect, useState } from 'react';
-
-interface Products {
-    id: number
-    title: string
-    price: number
-    images: string
-}
+import { typeProduct } from '../../interfaces';
 
 function Products() {
-    const [products, setProducts] = useState<Products[]>([])
+    const [products, setProducts] = useState<typeProduct[]>([])
     const [loading, setLoading] = useState(false)
     const [limit, setLimit] = useState(4);
 
@@ -18,7 +12,6 @@ function Products() {
             try {
                 const res = await axios.get(`https://api.escuelajs.co/api/v1/products?offset=0&limit=${limit}`);
                 if(res.statusText != "") {
-                    console.log(res.data)
                     setProducts(res.data);
                     setLimit(limit + 4)
                 }
@@ -27,7 +20,6 @@ function Products() {
             }finally {
                 setLoading(true)
             }
-            
         }
         fetchApi();
     },[])
@@ -74,7 +66,7 @@ function Products() {
                 </div>
                 </>
             ) : (
-                <p className="text-center text-xl">Loading</p>
+                <p className="text-center text-xl">Loading...</p>
             )}
         </>
     );

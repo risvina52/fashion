@@ -1,14 +1,9 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-
-interface Category {
-    id: number
-    image: string
-    name: string
-}
+import { typeCategory } from "../../interfaces";
 
 function Categories() {
-    const [categories, setCategories] = useState<Category[]>([])
+    const [categories, setCategories] = useState<typeCategory[]>([])
     const [loading, setLoading] = useState(false)
 
     useEffect(() => {
