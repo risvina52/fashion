@@ -1,3 +1,4 @@
+import Categories from '../../components/categories';
 import Footer from '../../components/footer';
 import Header from '../../components/header';
 
@@ -6,7 +7,7 @@ function Category() {
         <>
             <Header />
             <main className="container mx-auto px-3">
-                Page Category
+                <Categories />
             </main>
             <Footer />
         </>
