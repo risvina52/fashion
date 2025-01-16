@@ -28,6 +28,7 @@ function Product() {
     const [rangePrice, setRangePrice] = useState<number>(50);
     const [categories, setCategories] = useState<typeCategory[]>([])
     const [products, setProducts] = useState<typeProduct[]>([])
+    const [loading, setLoading] = useState<boolean>(true)
     const storageCheckbox = useRef<string[]>([])
 
     const handleChangeRange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -75,6 +76,23 @@ function Product() {
         };
         fetchApi();
     }, []);
+
+    useEffect(() => {
+        const fetchApi = async () => {
+            try {
+                setLoading(true)
+                const res = await axios.get(`https://api.escuelajs.co/api/v1/products?offset=0`);
+                if(res.statusText != "") {
+                    setProducts(res.data);
+                }
+            }catch(err) {
+                console.log(err)
+            }finally {
+                setLoading(false)
+            }
+        }
+        fetchApi();
+    },[])
 
     return (
         <>
@@ -130,10 +148,7 @@ function Product() {
                         </div>
                     </div>
                     <div className='w-[88%]'>
-                        {products.map((product) => (
-                            <li key={product.id}>{product.title}</li>
-                        ))}
-                        <Products />
+                        <Products products={products} loading={loading} />
                     </div>
                 </div>
             </main>

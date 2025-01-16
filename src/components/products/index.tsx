@@ -1,46 +1,15 @@
-import axios from 'axios';
-import { useEffect, useState } from 'react';
 import { typeProduct } from '../../interfaces';
 
-function Products() {
-    const [products, setProducts] = useState<typeProduct[]>([])
-    const [loading, setLoading] = useState(false)
-    const [limit, setLimit] = useState(4);
+interface Props {
+    products: typeProduct[]
+    loading: boolean
+    handleLoadMore?: () => void
+}
 
-    useEffect(() => {
-        const fetchApi = async () => {
-            try {
-                const res = await axios.get(`https://api.escuelajs.co/api/v1/products?offset=0&limit=${limit}`);
-                if(res.statusText != "") {
-                    setProducts(res.data);
-                    setLimit(limit + 4)
-                }
-            }catch(err) {
-                console.log(err)
-            }finally {
-                setLoading(true)
-            }
-        }
-        fetchApi();
-    },[])
-
-    const handleLoadMore = async () => {
-        try {
-            const res = await axios.get(`https://api.escuelajs.co/api/v1/products?offset=0&limit=${limit}`);
-            if(res.statusText != "") {
-                setProducts(res.data);
-                setLimit(limit + 4)
-            }
-        }catch(err) {
-            console.log(err)
-        }finally {
-            setLoading(true)
-        }
-    }
-    
+const Products:React.FC<Props> = ({products, loading, handleLoadMore}) => {
     return ( 
         <>
-            {loading ? (
+            {!loading ? (
                 <>
                 <ul className="grid grid-cols-4 gap-6">
                     {products.map((product) => (
@@ -61,9 +30,11 @@ function Products() {
                         </li>
                     ))}
                 </ul>
-                <div className='text-center mt-10'>
-                    <button className='bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500' onClick={handleLoadMore}>Load more</button>
-                </div>
+                {handleLoadMore && (
+                    <div className='text-center mt-10'>
+                        <button className='bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500' onClick={handleLoadMore}>Load more</button>
+                    </div>
+                )}
                 </>
             ) : (
                 <p className="text-center text-xl">Loading...</p>
