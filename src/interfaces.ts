@@ -12,4 +12,5 @@ export interface typeProduct {
     title: string
     price: number
     images: string
+    updatedAt: string
 }

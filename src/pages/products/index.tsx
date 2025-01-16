@@ -1,5 +1,5 @@
 import axios from 'axios';
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import Footer from '../../components/footer';
 import Header from '../../components/header';
 import Products from '../../components/products';
@@ -15,29 +15,83 @@ const sorts = [
         slug: 'asc'
     },
     {
-        name: 'Price Low to High',
-        slug: 'price-asc'
-    },
-    {
         name: 'Price Hight to Low',
         slug: 'price-desc'
+    },
+    {
+        name: 'Price Low to High',
+        slug: 'price-asc'
     },
 ]
 
 function Product() {
-    const [rangePrice, setRangePrice] = useState<number>(50);
+    const [rangePrice, setRangePrice] = useState<number>(0);
     const [categories, setCategories] = useState<typeCategory[]>([])
     const [products, setProducts] = useState<typeProduct[]>([])
     const [loading, setLoading] = useState<boolean>(true)
     const storageCheckbox = useRef<string[]>([])
 
+    const debouce = (callback: (event: number) => void, delay: number) => {
+          let timeout: ReturnType<typeof setTimeout> | null = null;
+
+          return (event: number) => {
+            if (timeout) {
+              clearTimeout(timeout);
+            }
+            timeout = setTimeout(() => {
+              callback(event);
+            }, delay);
+        };
+    }
+        
+    const requestApiProduct = useCallback(debouce(async (value) => {
+        try {
+            const res = await axios.get(`https://api.escuelajs.co/api/v1/products?offset=0`);
+            if(res.statusText != "") {
+                const filteredProducts = res.data.filter((item: typeProduct) => {
+                    return item.price < value
+                });
+                setProducts(filteredProducts);
+            }
+        }catch(err) {
+            console.log(err)
+        }
+    },1000), []);
+
     const handleChangeRange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const value = parseInt(event.target.value)
         setRangePrice(value)
+        requestApiProduct(value)
     }
-    const handleSort = (event: React.ChangeEvent<HTMLInputElement>) => {
+    
+    const handleSort = async (event: React.ChangeEvent<HTMLInputElement>) => {
         const value = event.target.value
-        console.log(value)
+        try {
+            const res = await axios.get(`https://api.escuelajs.co/api/v1/products?offset=0`);
+            if(res.statusText != "") {
+                let data = [];
+                if(value == 'desc') {
+                    data = res.data.sort((a: typeProduct, b: typeProduct) => {
+                        return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
+                    });
+                } else if(value == 'asc') {
+                    data = res.data.sort((a: typeProduct, b: typeProduct) => {
+                        return new Date(a.updatedAt).getTime() - new Date(b.updatedAt).getTime();
+                    });
+                } else if(value == 'price-desc') {
+                    data = res.data.sort((a: typeProduct, b: typeProduct) => {
+                        return b.price - a.price;
+                    });
+                } else if(value == 'price-asc') {
+                    data = res.data.sort((a: typeProduct, b: typeProduct) => {
+                        return a.price - b.price;
+                    });
+                }
+                setProducts(data)
+            }
+        }catch(err) {
+            console.log(err)
+        }
     }
     const handleCheckbox = async (event: React.ChangeEvent<HTMLInputElement>) => {
         const value = event.target.value
@@ -51,7 +105,7 @@ function Product() {
         }
 
         try {
-            const res = await axios.get(`https://api.escuelajs.co/api/v1/products?offset=0&limit=12`);
+            const res = await axios.get(`https://api.escuelajs.co/api/v1/products?offset=0`);
             if(res.statusText != "") {
                 const filter = res.data.filter((item:typeCategory) => {
                     return storageCheckbox.current.includes(item.category.name)
