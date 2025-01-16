@@ -1,5 +1,5 @@
 import axios from 'axios';
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Footer from '../../components/footer';
 import Header from '../../components/header';
 import Products from '../../components/products';
@@ -24,99 +24,57 @@ const sorts = [
     },
 ]
 
+interface Filters {
+    rangePrice: number
+    sort: string
+    categories: string[]
+}
+
 function Product() {
-    const [rangePrice, setRangePrice] = useState<number>(0);
     const [categories, setCategories] = useState<typeCategory[]>([])
     const [products, setProducts] = useState<typeProduct[]>([])
     const [loading, setLoading] = useState<boolean>(true)
-    const storageCheckbox = useRef<string[]>([])
-
-    const debouce = (callback: (event: number) => void, delay: number) => {
-          let timeout: ReturnType<typeof setTimeout> | null = null;
-
-          return (event: number) => {
-            if (timeout) {
-              clearTimeout(timeout);
-            }
-            timeout = setTimeout(() => {
-              callback(event);
-            }, delay);
-        };
-    }
-        
-    const requestApiProduct = useCallback(debouce(async (value) => {
-        try {
-            const res = await axios.get(`https://api.escuelajs.co/api/v1/products?offset=0`);
-            if(res.statusText != "") {
-                const filteredProducts = res.data.filter((item: typeProduct) => {
-                    return item.price < value
-                });
-                setProducts(filteredProducts);
-            }
-        }catch(err) {
-            console.log(err)
-        }
-    },1000), []);
+    const [filters, setFilters] = useState<Filters>({
+        rangePrice : 50,
+        sort : '',
+        categories: []
+    })
 
     const handleChangeRange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const value = parseInt(event.target.value)
-        setRangePrice(value)
-        requestApiProduct(value)
+        setFilters((prev) => {
+            return {
+                ...prev, 
+                rangePrice: value
+            }
+        })
     }
     
     const handleSort = async (event: React.ChangeEvent<HTMLInputElement>) => {
         const value = event.target.value
-        try {
-            const res = await axios.get(`https://api.escuelajs.co/api/v1/products?offset=0`);
-            if(res.statusText != "") {
-                let data = [];
-                if(value == 'desc') {
-                    data = res.data.sort((a: typeProduct, b: typeProduct) => {
-                        return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
-                    });
-                } else if(value == 'asc') {
-                    data = res.data.sort((a: typeProduct, b: typeProduct) => {
-                        return new Date(a.updatedAt).getTime() - new Date(b.updatedAt).getTime();
-                    });
-                } else if(value == 'price-desc') {
-                    data = res.data.sort((a: typeProduct, b: typeProduct) => {
-                        return b.price - a.price;
-                    });
-                } else if(value == 'price-asc') {
-                    data = res.data.sort((a: typeProduct, b: typeProduct) => {
-                        return a.price - b.price;
-                    });
-                }
-                setProducts(data)
+        setFilters((prev) => {
+            return {
+                ...prev,
+                sort: value
             }
-        }catch(err) {
-            console.log(err)
-        }
+        })
     }
     const handleCheckbox = async (event: React.ChangeEvent<HTMLInputElement>) => {
         const value = event.target.value
         const checked = event.target.checked
-        if(checked) {
-            if (!storageCheckbox.current.includes(value)) {
-                storageCheckbox.current.push(value);
-            }
-        }else {
-            storageCheckbox.current = storageCheckbox.current.filter(item => item !== value);
-        }
 
-        try {
-            const res = await axios.get(`https://api.escuelajs.co/api/v1/products?offset=0`);
-            if(res.statusText != "") {
-                const filter = res.data.filter((item:typeCategory) => {
-                    return storageCheckbox.current.includes(item.category.name)
-                })
-                setProducts(filter)
+        setFilters((prev) => {
+            let updateCategory = [];
+            if(checked) {
+                updateCategory = [...prev.categories, value]
+            }else {
+                updateCategory = prev.categories.filter(cat => cat !== value)
             }
-        }catch(err) {
-            console.log(err)
-        }
+            return { ...prev, categories: updateCategory };
+        });
     }
 
+    // loading Cateogry
     useEffect(() => {
         const fetchApi = async () => {
             try {
@@ -131,22 +89,64 @@ function Product() {
         fetchApi();
     }, []);
 
-    useEffect(() => {
-        const fetchApi = async () => {
-            try {
-                setLoading(true)
-                const res = await axios.get(`https://api.escuelajs.co/api/v1/products?offset=0`);
-                if(res.statusText != "") {
-                    setProducts(res.data);
+    const debouce = (callback: (...args: Filters[]) => void, delay: number) => {
+        let timeout: ReturnType<typeof setTimeout> | null = null;
+        return (...args: Filters[]) => {
+            if (timeout) clearTimeout(timeout);
+            timeout = setTimeout(() => {
+                callback(...args);
+            }, delay);
+        };
+    };
+        
+    const requestApiProduct = useCallback(debouce(async (filters) => {
+        try {
+            setLoading(true)
+            const res = await axios.get(`https://api.escuelajs.co/api/v1/products?offset=0`);
+            if(res.statusText != "") {
+                let data = res.data
+
+                data = data.filter((item:typeProduct) => item.price < filters.rangePrice)
+
+                if(filters.sort == 'desc') {
+                    data = data.sort((a: typeProduct, b: typeProduct) => {
+                        return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
+                    });
+                } else if(filters.sort == 'asc') {
+                    data = data.sort((a: typeProduct, b: typeProduct) => {
+                        return new Date(a.updatedAt).getTime() - new Date(b.updatedAt).getTime();
+                    });
+                } else if(filters.sort == 'price-desc') {
+                    data = data.sort((a: typeProduct, b: typeProduct) => {
+                        return b.price - a.price;
+                    });
+                } else if(filters.sort == 'price-asc') {
+                    data = data.sort((a: typeProduct, b: typeProduct) => {
+                        return a.price - b.price;
+                    });
                 }
-            }catch(err) {
-                console.log(err)
-            }finally {
-                setLoading(false)
+
+                data = data.filter((item:typeProduct) => {
+                    if(filters.categories.length > 0) {
+                        return filters.categories.includes(item.category.name)
+                    } else {
+                        return item
+                    }
+                })
+                console.log(filters)
+                setProducts(data);
             }
+        }catch(err) {
+            console.log(err)
+        }finally {
+            setLoading(false)
         }
-        fetchApi();
-    },[])
+    },1000), []);
+    
+    // loading Products
+    useEffect(() => {
+        requestApiProduct(filters)
+    },[filters])
 
     return (
         <>
@@ -157,14 +157,14 @@ function Product() {
                         <h3 className="mb-5 text-xl font-bold text-[#ce0019]">Filter</h3>
                         <p className="flex items-center justify-between mb-2">
                             <strong>Price</strong>
-                            <span>{rangePrice}$</span>
+                            <span>{filters.rangePrice}$</span>
                         </p>
                         <div className="mb-5">
                             <input
                                 type="range"
                                 min="0"
                                 max="100"
-                                value={rangePrice}
+                                value={filters.rangePrice}
                                 className="w-full accent-[#000]"
                                 onChange={handleChangeRange}
                             />

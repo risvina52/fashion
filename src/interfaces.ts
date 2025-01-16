@@ -2,9 +2,6 @@ export interface typeCategory {
     id: number
     name: string
     image: string
-    category : {
-        name: string
-    }
 }
 
 export interface typeProduct {
@@ -13,4 +10,7 @@ export interface typeProduct {
     price: number
     images: string
     updatedAt: string
+    category : {
+        name: string
+    }
 }
