@@ -1,27 +1,11 @@
-import { useEffect, useState } from "react";
-import axios from "axios";
 import { typeCategory } from "../../interfaces";
 
-function Categories() {
-    const [categories, setCategories] = useState<typeCategory[]>([])
-    const [loading, setLoading] = useState(false)
+interface Props {
+    categories: typeCategory[]
+    loading: boolean
+}
 
-    useEffect(() => {
-        const fetchApi = async () => {
-            try {
-                const res = await axios.get("https://api.escuelajs.co/api/v1/categories");
-                if (res.statusText !== "") {
-                    setCategories(res.data);
-                }
-            }catch(err) {
-                console.log(err)
-            }finally {
-                setLoading(true)
-            }
-        };
-        fetchApi();
-    }, []);
-
+const Categories:React.FC<Props> = ({categories, loading}) => {
     return ( 
         <>
             {loading ? (
@@ -31,7 +15,7 @@ function Categories() {
                             <figure className="mb-2 hover:opacity-85">
                                 <a href={`category/${category.id}`}>
                                     <img 
-                                        className="w-full aspect-square bg-[#ccc]"
+                                        className="w-full object-cover aspect-square bg-[#ccc]"
                                         src={category.image}
                                         alt={category.name}
                                     />

@@ -110,11 +110,11 @@ function Product() {
 
                 if(filters.sort == 'desc') {
                     data = data.sort((a: typeProduct, b: typeProduct) => {
-                        return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
+                        return new Date(b.creationAt).getTime() - new Date(a.creationAt).getTime();
                     });
                 } else if(filters.sort == 'asc') {
                     data = data.sort((a: typeProduct, b: typeProduct) => {
-                        return new Date(a.updatedAt).getTime() - new Date(b.updatedAt).getTime();
+                        return new Date(a.creationAt).getTime() - new Date(b.creationAt).getTime();
                     });
                 } else if(filters.sort == 'price-desc') {
                     data = data.sort((a: typeProduct, b: typeProduct) => {
@@ -133,7 +133,6 @@ function Product() {
                         return item
                     }
                 })
-                console.log(filters)
                 setProducts(data);
             }
         }catch(err) {

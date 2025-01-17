@@ -9,6 +9,7 @@ export interface typeProduct {
     title: string
     price: number
     images: string
+    creationAt: string
     updatedAt: string
     category : {
         name: string

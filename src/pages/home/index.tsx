@@ -6,12 +6,29 @@ import Header from '../../components/header';
 import News from '../../components/news';
 import Products from '../../components/products';
 import { useEffect, useState } from 'react';
-import { typeProduct } from '../../interfaces';
+import { typeCategory, typeProduct } from '../../interfaces';
 
 function Home() {
     const [loading, setLoading] = useState<boolean>(true)
+    const [categories, setCategories] = useState<typeCategory[]>([])
     const [products, setProducts] = useState<typeProduct[]>([])
     const [nextPage, setNextPage] = useState<number>(4);
+
+    useEffect(() => {
+        const fetchApi = async () => {
+            try {
+                const res = await axios.get("https://api.escuelajs.co/api/v1/categories");
+                if (res.statusText !== "") {
+                    setCategories(res.data);
+                }
+            }catch(err) {
+                console.log(err)
+            }finally {
+                setLoading(true)
+            }
+        };
+        fetchApi();
+    }, []);
 
     useEffect(() => {
         const fetchApi = async () => {
@@ -49,7 +66,7 @@ function Home() {
             <Banner />
             <section className="mt-12">
                 <h2 className="text-center font-bold text-3xl text-[#ce0019] mb-8">CATEGORIES</h2>
-                <Categories />
+                <Categories categories={categories} loading={loading} />
             </section>
             <section className="mt-12">
                 <h2 className="text-center font-bold text-3xl text-[#ce0019] mb-8">ALL PRODUCTS</h2>

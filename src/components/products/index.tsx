@@ -17,7 +17,7 @@ const Products:React.FC<Props> = ({products, loading, handleLoadMore}) => {
                             <figure className="mb-4 hover:opacity-85">
                                 <a href="/">
                                     <img 
-                                        className="w-full aspect-square bg-[#ccc]"
+                                        className="w-full object-cover aspect-square bg-[#ccc]"
                                         src={product.images[0]} 
                                         alt={product.title}
                                     />
