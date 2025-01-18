@@ -8,7 +8,7 @@ interface Props {
 const Categories:React.FC<Props> = ({categories, loading}) => {
     return ( 
         <>
-            {loading ? (
+            {!loading ? (
                 <ul className="grid grid-cols-3 gap-4 lg:grid-cols-6 md:grid-cols-4">
                     {categories.map((category) => (
                         <li key={category.id}>

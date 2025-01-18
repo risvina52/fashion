@@ -12,6 +12,7 @@ export interface typeProduct {
     creationAt: string
     updatedAt: string
     category : {
+        id: number
         name: string
     }
 }

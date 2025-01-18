@@ -1,5 +1,6 @@
 import { Routes, Route } from "react-router";
 import Category from "./pages/categorys";
+import CategoryProducts from "./pages/categoryProducts";
 import Login from "./pages/login";
 import Home from "./pages/home";
 import Register from "./pages/register";
@@ -16,6 +17,7 @@ function App() {
         <Route path="/products" element={<Products />} />
         <Route path="category">
           <Route index element={<Category />} />
+          <Route path="/category/:categoryId" element={<CategoryProducts />} />
           {/* <Route path="product" element={<Product />} /> */}
         </Route>
       </Routes>

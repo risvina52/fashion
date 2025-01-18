@@ -19,7 +19,7 @@ function Category() {
             }catch(err) {
                 console.log(err)
             }finally {
-                setLoading(true)
+                setLoading(false)
             }
         };
         fetchApi();
@@ -29,7 +29,9 @@ function Category() {
         <>
             <Header />
             <main className="container mx-auto px-3">
-                <h2 className="text-center font-bold text-3xl text-[#ce0019] mb-8">CATEGORIES</h2>
+                <h2 className="text-center font-bold text-3xl text-[#ce0019] mb-8">
+                    Categories
+                </h2>
                 <Categories categories={categories} loading={loading} />
             </main>
             <Footer />
