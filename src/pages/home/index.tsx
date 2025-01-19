@@ -17,14 +17,15 @@ function Home() {
     useEffect(() => {
         const fetchApi = async () => {
             try {
-                const res = await axios.get("https://api.escuelajs.co/api/v1/categories");
+                setLoading(true)
+                const res = await axios.get("https://api.escuelajs.co/api/v1/categories?offset=0&limit=12");
                 if (res.statusText !== "") {
                     setCategories(res.data);
                 }
             }catch(err) {
                 console.log(err)
             }finally {
-                setLoading(true)
+                setLoading(false)
             }
         };
         fetchApi();

@@ -15,7 +15,7 @@ const Products:React.FC<Props> = ({products, loading, handleLoadMore}) => {
                     {products.map((product) => (
                         <li key={product.id}>
                             <figure className="mb-4 hover:opacity-85">
-                                <a href="/">
+                                <a href={`/product/${product.id}`}>
                                     <img 
                                         className="w-full object-cover aspect-square bg-[#ccc]"
                                         src={product.images[0]} 
