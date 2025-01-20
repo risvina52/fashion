@@ -6,6 +6,7 @@ import Home from "./pages/home";
 import Register from "./pages/register";
 import Products from "./pages/products";
 import Details from "./pages/details";
+import Cart from "./pages/cart";
 
 function App() {
 
@@ -23,6 +24,7 @@ function App() {
         <Route path="product">
           <Route path="/product/:productId" element={<Details />} />
         </Route>
+        <Route path="/cart" element={<Cart />} />
       </Routes>
     </>
   )

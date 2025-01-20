@@ -11,28 +11,29 @@ const Products:React.FC<Props> = ({products, loading, handleLoadMore}) => {
         <>
             {!loading ? (
                 <>
-                <ul className="grid grid-cols-4 gap-6">
+                <div className="mt-6 grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-4 xl:gap-x-8">
                     {products.map((product) => (
-                        <li key={product.id}>
-                            <figure className="mb-4 hover:opacity-85">
+                        <div key={product.id} className="group relative">
+                        <img
+                            alt={product.title}
+                            src={product.images[0]}
+                            className="aspect-square w-full bg-gray-200 object-cover group-hover:opacity-75 lg:aspect-auto lg:h-80"
+                        />
+                        <div className="mt-3 flex justify-between">
+                            <h3 className="text-black">
                                 <a href={`/product/${product.id}`}>
-                                    <img 
-                                        className="w-full object-cover aspect-square bg-[#ccc]"
-                                        src={product.images[0]} 
-                                        alt={product.title}
-                                    />
+                                <span aria-hidden="true" className="absolute inset-0" />
+                                {product.title}
                                 </a>
-                            </figure>
-                            <div className="text-center">
-                                <h3 className="text-[#8A8A8F] mb-1 hover:text-[#59595a]"><a href="">{product.title}</a></h3>
-                                <p className="text-[#ce0019]">{product.price}$</p>
-                            </div>
-                        </li>
+                            </h3>
+                            <p className=" text-[#ce0019]">{product.price}$</p>
+                        </div>
+                        </div>
                     ))}
-                </ul>
+                </div>
                 {handleLoadMore && (
-                    <div className='text-center mt-10'>
-                        <button className='bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500' onClick={handleLoadMore}>Load more</button>
+                    <div className='text-center mt-8'>
+                        <button className='bg-black text-white py-2 px-5 rounded-lg hover:opacity-75 focus:outline-none' onClick={handleLoadMore}>Load more</button>
                     </div>
                 )}
                 </>
