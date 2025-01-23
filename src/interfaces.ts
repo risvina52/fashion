@@ -8,6 +8,7 @@ export interface typeProduct {
     id: number
     title: string
     price: number
+    quality: number
     description: string
     images: string
     creationAt: string

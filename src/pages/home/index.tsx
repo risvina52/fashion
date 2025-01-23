@@ -7,7 +7,6 @@ import News from '../../components/news';
 import Products from '../../components/products';
 import { useEffect, useState } from 'react';
 import { typeCategory, typeProduct } from '../../interfaces';
-
 function Home() {
     const [loading, setLoading] = useState<boolean>(true)
     const [categories, setCategories] = useState<typeCategory[]>([])

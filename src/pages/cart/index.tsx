@@ -9,14 +9,21 @@ const Cart:React.FC = () => {
     const [products, setProducts] = useState<typeProduct[]>([])
     const getStorageCart = localStorage.getItem('cart')
     const parseCart = getStorageCart ? JSON.parse(getStorageCart) : []
-    const subTotal = products.reduce((acc, product) => acc + product.price, 0)
+    const subTotal = products.reduce((acc, product) => acc + (product.price * product.quality), 0)
+
     useEffect(()=>{
         const fetchApi = async () => {
             try {
                 const res = await axios.get(`https://api.escuelajs.co/api/v1/products`);
                 if(res.statusText != "") {
-                    const filterCart = res.data.filter((cart:typeProduct) => parseCart.includes(cart.id))
-                    setProducts(filterCart)
+                    const filteredProducts = res.data.filter((product: typeProduct) => {
+                        return parseCart.find((q: typeProduct) => product.id === q.id)
+                    });
+                    const updatedProducts = filteredProducts.map((product: typeProduct) => {
+                        const quality = parseCart.find((q: typeProduct) => q.id === product.id)?.quality;
+                        return { ...product, quality };
+                    });
+                    setProducts(updatedProducts)
                 }
             } catch(err) {
                 console.log(err)
@@ -27,13 +34,15 @@ const Cart:React.FC = () => {
 
     const handleRemove = (id:number) => {
         setProducts((prev) => {
-            const array:number[] = []
-            const filterRemove = prev.filter((item) => item.id !== id)
-            filterRemove.map((item) => {
-                array.push(item.id)
+            const updatedProducts = prev.filter((item) => item.id !== id)
+            const localData = updatedProducts.map((item) => {
+                return {
+                    id: item.id,
+                    quality: item.quality
+                }
             })
-            localStorage.setItem('cart', JSON.stringify(array))
-            return filterRemove
+            localStorage.setItem('cart', JSON.stringify(localData))
+            return updatedProducts
         })
     }
 
@@ -61,7 +70,7 @@ const Cart:React.FC = () => {
                                         <p className="mt-1 text-sm text-gray-500">{product.category.name}</p>
                                     </div>
                                     <div className="flex flex-1 items-end justify-between text-sm">
-                                        <p className="text-gray-500">Qty 1</p>
+                                        <p className="text-gray-500">Qty {product.quality}</p>
                                         <div className="flex">
                                             <button
                                                 onClick={() => handleRemove(product.id)}
@@ -77,7 +86,7 @@ const Cart:React.FC = () => {
                         ))}
                     </ul>
                     <div className="w-[35%] px-6 py-6 sm:px-6 bg-[#f7f7f7] rounded-md">
-                        <h3 className="font-bold text-lg mb-2">Order Summary</h3>
+                        <h3 className="text-lg mb-2">Order Summary</h3>
                             <div className="divide-y divide-[#e4e4e4]">
                             <div className="flex justify-between text-base font-medium text-gray-900 py-3">
                                 <p>Subtotal</p>
@@ -91,7 +100,7 @@ const Cart:React.FC = () => {
                                 <p>Tax estimate</p>
                                 <p>$10.00</p>
                             </div>
-                            <div className="flex justify-between text-lg font-bold text-gray-900 py-3">
+                            <div className="flex justify-between text-lg text-gray-900 py-3">
                                 <p>Order total</p>
                                 <p>${subTotal + 5.00 + 10.00}</p>
                             </div>

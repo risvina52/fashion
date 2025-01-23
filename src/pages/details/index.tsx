@@ -9,6 +9,7 @@ import Products from "../../components/products";
 const Details:React.FC = () => {
     const { productId } = useParams()
     const productIdNumber = Number(productId)
+    const [quality, setQuality] = useState<number>(1)
     const [loading, setLoading] = useState<boolean>(true)
     const [releated, setReleated] = useState<typeProduct[]>([])
     const [success, setSuccess] = useState<boolean>(false)
@@ -16,6 +17,7 @@ const Details:React.FC = () => {
         id: 0,
         title: '',
         price: 0,
+        quality: 0,
         description: '',
         images: '',
         creationAt: '',
@@ -48,19 +50,34 @@ const Details:React.FC = () => {
     },[])
     
     const handleAddtoCart = () => {
-        const arrCart:number[] = []
         const getStorageCart = localStorage.getItem('cart')
-        const parseCart: number[] = getStorageCart ? JSON.parse(getStorageCart) : []
-        if(!getStorageCart) {
-            arrCart.push(productIdNumber)
-            localStorage.setItem('cart', JSON.stringify(arrCart))
-        } else {
-            if(!parseCart.includes(productIdNumber)) {
-                parseCart.push(productIdNumber)
-            }
-            localStorage.setItem('cart', JSON.stringify(parseCart))
+        const parseCart = getStorageCart ? JSON.parse(getStorageCart) : []
+
+        const objectCart = {
+            id: productIdNumber,
+            quality: quality
         }
+
+        if(!getStorageCart) {
+            parseCart.push(objectCart)
+        } else {
+            let productExists = false;
+            parseCart.forEach((item:typeProduct) => {
+                if(item.id == productIdNumber ) {
+                    item.quality += quality
+                    productExists = true;
+                }
+            });
+            if (!productExists) {
+                parseCart.push(objectCart);
+            }
+        }
+        localStorage.setItem('cart', JSON.stringify(parseCart))
         setSuccess(true)
+    }
+
+    const handleChangeQuality = (event:React.ChangeEvent<HTMLInputElement>) => {
+        setQuality(parseInt(event.target.value))
     }
 
     return (
@@ -71,7 +88,7 @@ const Details:React.FC = () => {
                     <>  
                         {success && (
                             <div className="px-5 py-4 bg-[#cbf7c5] rounded-md mb-8 text-sm text-[#175d0b] flex items-center justify-between gap-3">
-                                “100 Days of Inspiration: 3 Generations of Wisdom (eBook PDF)” has been added to your cart.
+                                “{details.title}” has been added to your cart.
                                 <a href="/cart" className="px-5 py-2 bg-[#ce0019] text-white rounded-md hover:opacity-75">View Cart</a>
                             </div>
                         )}
@@ -85,9 +102,15 @@ const Details:React.FC = () => {
                                 <span className="mb-2 inline-block text-[17px] text-[#ce0019] font-bold">{details.category.name}</span>
                                 <h1 className="mb-5 font-bold text-3xl">{details.title}</h1>
                                 <p className="mb-5 text-[17px]"><strong>Price</strong> : <strong className="text-[#ce0019]">{details.price}$</strong></p>
-                                <p className="mb-5">
-                                    <strong>Quality</strong> : 
-                                    <input className="ml-2 w-16 px-3 text-center py-1 border border-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" value={1} type="number" />
+                                <p className="mb-5 flex items-center">
+                                    <strong className="mr-2">Quality : </strong>
+                                    <button className="bg-black text-white py-1 px-3 border" onClick={() => setQuality((prev) => prev < 2 ? prev :  prev - 1)}>-</button>
+                                    <input 
+                                        onChange={(e) => handleChangeQuality(e)}
+                                        value={quality}
+                                        className="w-12 px-1 text-center py-1 border border-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
+                                    />
+                                    <button className="bg-black text-white py-1 px-3 border" onClick={() => setQuality((prev) => prev + 1)}>+</button>
                                 </p>
                                 <div className="mb-5">
                                     <strong className="mb-2 block">Descriptions</strong>
